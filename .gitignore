@@ -2,3 +2,8 @@
 /Tup.AhoCorasick/bin/*
 /Tup.AhoCorasick/obj/*
 /*.suo
+/Tup.AhoCorasick.NetCore21/obj
+/Tup.AhoCorasick.NetCore21/bin/Debug/netcoreapp2.1
+/Tup.AhoCorasick.NET461/obj/x86
+/Tup.AhoCorasick.NET461/bin/Debug
+/.vs

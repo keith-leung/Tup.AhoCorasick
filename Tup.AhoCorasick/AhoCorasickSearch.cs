@@ -1,25 +1,18 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Tup.AhoCorasick
 {
     /// <summary>
-    /// Aho-Corasick Search
+    /// Aho-Corasick搜索
     /// </summary>
-    /// <remarks>
-    /// Aho-Corasick exact set matching algorithm
-    /// Search time: O(n + m + z), where z is number of pattern occurrences
-    ///
-    /// This implementation is loosely based on http://www.codeproject.com/useritems/ahocorasick.asp
-    /// 
-    /// String Matching: An Aid to Bibliographic Search - Alfred V. Aho and Margaret J. Corasick (Bell Laboratories) (http://hidden.dankirsh.com/CS549/paper.pdf)
-    /// 
-    /// Set Matching and Aho-Corasick Algorithm - Pekka Kilpeläinen (University of Kuopio) (www.cs.uku.fi/~kilpelai/BSA05/lectures/slides04.pdf)
-    /// http://www-sr.informatik.uni-tuebingen.de/~buehler/AC/AC.html
-    /// </remarks>
+    /// 搜索时间：O（n + m + z），其中z是模式出现的次数
     public class AhoCorasickSearch
     {
+        public bool IsCaseSensitive { get; set; }
+
         /// <summary>
         /// AC Tree Root
         /// </summary>
@@ -36,6 +29,9 @@ namespace Tup.AhoCorasick
         {
             if (string.IsNullOrEmpty(text))
                 return text;
+
+            if (IsCaseSensitive)
+                text = text.ToLowerInvariant();
 
             var result = this.SearchAll(text);
             if (result == null || result.Length <= 0)
@@ -63,6 +59,7 @@ namespace Tup.AhoCorasick
                 endIndex = rcLen;
                 resContent.Append(text.Substring(startIndex, endIndex - startIndex));
             }
+
             return resContent.ToString();
         }
 
@@ -88,6 +85,8 @@ namespace Tup.AhoCorasick
 
         public SearchResult[] SearchAll(string text, int start, int count)
         {
+            if (IsCaseSensitive)
+                text = text.ToLowerInvariant();
             CheckArguments(text, start, count);
 
             List<SearchResult> results = null;
@@ -108,6 +107,8 @@ namespace Tup.AhoCorasick
 
         public SearchResult SearchFirst(string text, int start)
         {
+            if (IsCaseSensitive)
+                text = text.ToLowerInvariant();
             CheckArguments(text, start, int.MaxValue);
 
             IEnumerator<SearchResult> iter = SearchIterator(text, start).GetEnumerator();
@@ -149,11 +150,12 @@ namespace Tup.AhoCorasick
                 {
                     foreach (string found in ptr.Outputs)
                         yield return new SearchResult(index - found.Length + 1, found);
-
                 }
+
                 index++;
             }
         }
+
         /// <summary>
         /// Build AC Tree
         /// </summary>
@@ -161,11 +163,15 @@ namespace Tup.AhoCorasick
         /// <returns></returns>
         public bool Build(params string[] keywords)
         {
+            if (IsCaseSensitive)
+                keywords = (from kw in keywords
+                            select kw.ToLowerInvariant()).ToArray();
             CheckKeywords(keywords);
 
             this.TreeRoot = BuildTree(keywords);
             return true;
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -176,6 +182,7 @@ namespace Tup.AhoCorasick
             Node root = new Node(null, ' ');
 
             #region build trie tree
+
             {
                 Node cNode = root;
                 Node newNode = null;
@@ -192,11 +199,14 @@ namespace Tup.AhoCorasick
                             newNode = new Node(cNode, c);
                             cNode.AddTransition(newNode);
                         }
+
                         cNode = newNode;
                     }
+
                     cNode.AddResult(keyword);
                 }
             }
+
             #endregion
 
             // Find failure functions
@@ -392,8 +402,9 @@ namespace Tup.AhoCorasick
 
         public override string ToString()
         {
-            return string.Format("[SearchResult Index:{0}, Length:{1}, Match:{2}]", this.Index, this.Length, this.Match);
-        } 
+            return string.Format("[SearchResult Index:{0}, Length:{1}, Match:{2}]", this.Index, this.Length,
+                this.Match);
+        }
 
         /// <summary>
         /// Determines whether the specified <see cref="System.Object"/> is equal to this instance.
@@ -410,6 +421,7 @@ namespace Tup.AhoCorasick
             SearchResult sr = (SearchResult)obj;
             return Index == sr.Index && Match == sr.Match;
         }
+
         /// <summary>
         /// 
         /// </summary>

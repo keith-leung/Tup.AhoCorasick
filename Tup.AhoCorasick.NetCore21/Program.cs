@@ -1,19 +1,17 @@
-using System;
-using System.Text;
+﻿using System;
 
-namespace Tup.AhoCorasick
+namespace Tup.AhoCorasick.NetCore21
 {
     class Program
     {
         static void Main(string[] args)
         {
-            var search = new AhoCorasickSearch();
-            var keywords = new string[] { "he", "she", "his", "hers" };
+            var search = new AhoCorasickSearch() { IsCaseSensitive = true };
+            var keywords = new string[] { "he", "She", "hIs", "herS" };
             search.Build(keywords);
-            
-            searchTest(search);
 
             searchTest(search);
+            replaceTest(search);
             replaceTest2();
             replaceTest3();
 
@@ -22,8 +20,13 @@ namespace Tup.AhoCorasick
 
         private static void searchTest(AhoCorasickSearch search)
         {
-            var res = search.SearchAll("ushers");
+            var res = search.SearchAll("ushersushers");
             Console.WriteLine(res);
+            for (int i = 0; i < res.Length; i++)
+            {
+                Console.WriteLine(res[i].ToString());
+                Console.WriteLine("Match=" + res[i].Match);
+            }
         }
 
         private static void replaceTest(AhoCorasickSearch search)
@@ -48,7 +51,7 @@ namespace Tup.AhoCorasick
         private static void replaceTest2()
         {
             var search = new AhoCorasickSearch();
-            var keywords = new string[] { "伟大","特色主义","公园" };
+            var keywords = new string[] { "伟大", "特色主义", "公园" };
             search.Build(keywords);
 
             var text = "从这里建设伟大的特色主义主题公园";

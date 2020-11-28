@@ -3,3 +3,6 @@
 
 
 FROM: http://code.google.com/p/libanculus-sharp/
+
+
+Slightly changed by keith-leung: case insensitive support. 
